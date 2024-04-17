@@ -1,0 +1,254 @@
+/*
+********************************************************************
+* PCI EHCI Device Driver for Irix 6.5                              *
+*                                                                  *
+* Programmed by BSDero                                             *
+* bsdero at gmail dot com                                          *
+* DMA utils                                                        *
+* 2011                                                             *
+*                                                                  *
+********************************************************************
+
+*******************************************************************************************************
+* FIXLIST (latest at top)                                                                             *
+*-----------------------------------------------------------------------------------------------------*
+* Author      MM-DD-YYYY     Description                                                              *
+*-----------------------------------------------------------------------------------------------------*
+* BSDero      01-05-2012     -Initial version                                                         *
+*                                                                                                     *
+*******************************************************************************************************
+*/
+
+typedef uint64_t        pciaddr_t;
+
+
+#define dma_list_init(ptr)             gc_list_init(ptr)
+#define dma_list_empty(l)              gc_list_empty(l)
+
+
+typedef gc_list_t           dma_list_t;
+
+
+
+typedef struct{
+    iopaddr_t               paddr;	/* starting phys addr */
+    caddr_t                 kaddr;	/* starting kern addr */
+    pciio_dmamap_t          map;	/* mapping resources (ugh!) */
+    pciaddr_t               daddr;	/* starting pci addr */
+    size_t                  pages;	/* size of block in pages */
+    size_t                  bytes;	/* size of block in bytes */
+    __psunsigned_t          handle;	/* mapping handle */
+    caddr_t                 kaddr_aligned; /* address aligned */
+    uchar_t                 *mem;       /* memory address */
+}dma_node_t;
+
+extern int		pci_user_dma_max_pages;
+
+
+dma_node_t *dma_alloc( vertex_hdl_t vhdl, dma_list_t *dma_list, size_t size, unsigned flags);
+void dma_drain( dma_node_t *dma_node);
+void dma_done( dma_node_t *dma_node);
+void dma_mark( dma_node_t *dma_node);
+void dma_free( dma_node_t *dma_node);
+void dma_list_sweep( dma_list_t *dma_list);
+void dma_list_destroy( dma_list_t *dma_list);
+void dma_list_dump( dma_list_t *dma_list);
+void dma_node_dump( dma_node_t *dma_node);
+
+
+dma_node_t *dma_alloc( vertex_hdl_t vhdl, dma_list_t *dma_list, size_t size, unsigned flags){
+    dma_node_t *dma_node;
+    void                   *kaddr = 0;
+    iopaddr_t               paddr;
+    pciio_dmamap_t          dmamap = 0;
+    size_t                  bytes = size;
+    long int                pages;
+    pciaddr_t               daddr;
+    int                     err = 0;
+    uchar_t                 *mem;       /* memory address */
+
+    TRACE( TRC_GC_DMA, 12, "enter", NULL);
+
+    dma_node = (dma_node_t *) gc_malloc( dma_list, sizeof(dma_node_t));
+	if( dma_node == NULL){
+	    TRACE( TRC_GC_DMA, 12, "no dma_node allocated, return NULL", NULL);
+        TRACE( TRC_GC_DMA, 12, "exit dma_node=0x%x", dma_node);	
+        USECDELAY(1000000);
+	    return( NULL);
+	}	 
+
+    bytes += 32; /* we need DMA 32bit aligned */
+    flags |= PCIIO_WORD_VALUES;	
+    TRACE( TRC_GC_DMA, 12, "user wants 0x%x bytes of DMA, flags 0x%x", bytes, flags);
+    mem = ( uchar_t *) DMALLOC( bytes);
+
+    if( mem == NULL){
+        TRACE( TRC_GC_DMA, 12, "no dma_ mem allocated", NULL);
+        USECDELAY(1000000);
+        gc_free( (void *) dma_node);
+		TRACE( TRC_GC_DMA, 12, "exit rc = NULL", NULL);
+        return( NULL);
+    }
+    
+    kaddr = (void *) mem;
+
+    TRACE( TRC_GC_DMA, 12, "kaddr is 0x%08x", kaddr);
+    USECDELAY(1000000);
+	paddr = kvtophys(kaddr);
+	daddr = pciio_dmatrans_addr( vhdl, 0, paddr, bytes, flags);
+
+	if (daddr == 0) {	/* "no direct path available" */
+	    TRACE( TRC_GC_DMA, 12, "dmatrans failed, trying dmamap", NULL);
+        USECDELAY(1000000);
+	    dmamap = pciio_dmamap_alloc	(vhdl, 0, bytes, flags);
+	    if (dmamap == 0) {
+			TRACE( TRC_GC_DMA, 12, "unable to allocate dmamap", NULL);
+            USECDELAY(1000000);
+			err = 1;
+			goto dma_alloc_exit;	/* "out of mapping resources" */
+		}
+		
+		daddr = pciio_dmamap_addr(dmamap, paddr, bytes);
+		if (daddr == 0) {
+			TRACE( TRC_GC_DMA, 12, "dmamap_addr failed", NULL);
+            USECDELAY(1000000);
+			err = 1;
+			goto dma_alloc_exit; /* "can't get there from here" */
+		}
+    }
+	TRACE( TRC_GC_DMA, 12, "daddr is 0x%08x", daddr);
+
+    USECDELAY(1000000);    
+    dma_node->bytes = bytes;
+	dma_node->pages = pages;
+	dma_node->paddr = paddr;
+	dma_node->kaddr = kaddr;
+	dma_node->map = dmamap;
+	dma_node->daddr = daddr;
+	dma_node->handle = 0;
+    dma_node->mem = mem;
+
+	TRACE( TRC_GC_DMA, 12, "dmap 0x%x contains kaddr 0x%x bytes 0x%x pa 0x%x pages 0x%x daddr 0x%x",
+    dmamap, kaddr, bytes, paddr, pages, daddr);
+    USECDELAY(1000000);
+	dma_alloc_exit:
+	if( err == 1){
+		gc_mark( (void *) dma_node);
+		dma_node = NULL;
+	}
+    TRACE( TRC_GC_DMA, 12, "exit dma_node=0x%x", dma_node);	
+	return( dma_node);
+}
+
+
+void dma_drain( dma_node_t *dma_node){
+/*   pciio_dmamap_drain(  pciio_dmamap_t *map) */
+
+    TRACE( TRC_GC_DMA, 12, "enter", NULL);
+    USECDELAY(1000000);
+    pciio_dmamap_drain( &dma_node->map);
+    TRACE( TRC_GC_DMA, 12, "exit ", NULL);	
+
+}
+
+void dma_done( dma_node_t *dma_node){
+/*      pciio_dmamap_done(pciio_dmamap_t map)*/ 
+    TRACE( TRC_GC_DMA, 12, "enter", NULL);
+    USECDELAY(1000000);
+    pciio_dmamap_done( dma_node->map);
+    TRACE( TRC_GC_DMA, 12, "exit ", NULL);	
+}
+
+void dma_mark( dma_node_t *dma_node){
+    TRACE( TRC_GC_DMA, 12, "enter", NULL);
+    dma_drain( dma_node);
+	dma_done( dma_node);
+	gc_mark( (void *) dma_node);
+    TRACE( TRC_GC_DMA, 12, "exit ", NULL);	
+}
+
+void dma_node_dump( dma_node_t *dma_node){
+    TRACE( TRC_GC_DMA, 12, "enter", NULL);
+    USECDELAY(1000000);
+    TRACE( TRC_GC_DMA, 12, "dma_node=0x%x\n", dma_node);
+    TRACE( TRC_GC_DMA, 12, " paddr = 0x%x\n", dma_node->paddr);
+    TRACE( TRC_GC_DMA, 12, " kaddr = 0x%x\n", dma_node->kaddr);
+    TRACE( TRC_GC_DMA, 12, " mem   = 0x%x\n", dma_node->mem);
+    TRACE( TRC_GC_DMA, 12, " map   = 0x%x\n", dma_node->map);
+    TRACE( TRC_GC_DMA, 12, " daddr = 0x%x\n", dma_node->daddr);
+    TRACE( TRC_GC_DMA, 12, " bytes = 0x%x\n", dma_node->bytes ); 
+    TRACE( TRC_GC_DMA, 12, "exit ", NULL);
+}
+
+void dma_free( dma_node_t *dma_node){
+ /*void      pciio_dmamap_free(pciio_dmamap_t map) */
+    TRACE( TRC_GC_DMA, 12, "enter", NULL);
+    TRACE( TRC_GC_DMA, 12, "dma_free node=0x%x", dma_node);
+    USECDELAY(1000000);
+	
+    dma_drain( dma_node);
+	dma_done( dma_node);
+    TRACE( TRC_GC_DMA, 12, "dmamap free dma_node->map=0x%x", dma_node->map);
+    USECDELAY(1000000);
+	pciio_dmamap_free( dma_node->map);
+    TRACE( TRC_GC_DMA, 12, "dma_free DFREE", NULL);
+    USECDELAY(1000000);
+    DFREE( (void *) dma_node->mem, dma_node->bytes);	
+    TRACE( TRC_GC_DMA, 12, "dma_free gcfree2", NULL);
+    USECDELAY(1000000);
+    gc_free( (void *) dma_node);
+    TRACE( TRC_GC_DMA, 12, "exit ", NULL);
+    USECDELAY(1000000);
+}
+
+void dma_list_sweep( dma_list_t *dma_list){
+    list_t *l, *i, *tmp;
+
+    TRACE( TRC_GC_DMA, 12, "enter ", NULL);
+	l = (list_t *) dma_list;
+
+	list_for_each_safe( i, tmp, l){
+	    if( (  (gc_node_t *) i)->mark == 1)
+            dma_free( (void *) gc_get_data(  (void *)i)   );
+	}    
+
+    TRACE( TRC_GC_DMA, 12, "exit ", NULL);	
+}
+
+void dma_list_dump( dma_list_t *dma_list){
+    list_t *l, *i, *tmp;
+    dma_node_t *dma_node;
+    TRACE( TRC_GC_DMA, 12, "enter ", NULL);
+    USECDELAY(1000000);
+
+        l = (list_t *) dma_list;
+
+        list_for_each_safe( i, tmp, l){
+            dma_node = gc_get_data(  (void *)i);
+            TRACE( TRC_GC_DMA, 12, "dma_node = 0x%x", dma_node);
+            dma_node_dump( dma_node);
+        }
+
+    TRACE( TRC_GC_DMA, 12, "exit ", NULL);
+
+}
+
+void dma_list_destroy( dma_list_t *dma_list){
+    list_t *l, *i, *tmp;
+    dma_node_t *dma_node;   
+    TRACE( TRC_GC_DMA, 12, "enter", NULL);
+    USECDELAY(1000000);
+   
+	l = (list_t *) dma_list;
+	
+	list_for_each_safe( i, tmp, l){
+	    dma_node = gc_get_data(  (void *)i);
+        TRACE( TRC_GC_DMA, 12, "dma_node = 0x%x", dma_node);
+        dma_free( dma_node); 		
+	}   
+
+    dma_list_init( dma_list);	
+    TRACE( TRC_GC_DMA, 12, "exit ", NULL);
+}
+
+

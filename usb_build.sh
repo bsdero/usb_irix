@@ -1,0 +1,165 @@
+#! /usr/nekoware/bin/bash
+####################################################################
+# PCI EHCI Device Driver for Irix 6.5                              #
+#                                                                  #
+# Programmed by BSDero                                             #
+# bsdero at gmail dot com                                          #
+# 2011/2012                                                        #
+#                                                                  #
+#                                                                  #
+# File: build.sh                                                   #
+# Description: Build script                                        #
+####################################################################
+
+
+echo "USB stack for SGI Irix 6.5.x"
+echo "<bsdero at gmail dot com>"
+
+
+CPUTYPE=`/sbin/hinv -c processor|head -1|awk '{ print $4}'`
+export CPUBOARD=$CPUTYPE
+echo "Building for "$CPUBOARD
+
+CC=/usr/bin/c99
+
+
+
+###################################################################
+#         GLOBAL - use these for all IRIX device drivers          #
+###################################################################
+
+CFLAGS="-D_KERNEL -DMP_STREAMS -D_MP_NETLOCKS -DMRSP_AS_MR \
+-fullwarn -non_shared -G 0 -TARG:force_jalr \
+-TENV:kernel -OPT:space -OPT:Olimit=0 -CG:unique_exit=on \
+-TENV:X=1 align_aggregate -OPT:IEEE_arithmetic=1 -OPT:roundoff=0 \
+-OPT:wrap_around_unsafe_opt=off"
+
+
+###################################################################
+#          32-bit - for device drivers on 32-bit systems          #
+###################################################################
+
+if [[ "$CPUBOARD" == "IP20" || "$CPUBOARD" == "IP22" || "$CPUBOARD" == "IP32" ]]; then
+   CFLAGS+=" -n32 -D_PAGESZ=4096"
+###################################################################
+#          64-bit - for device drivers on 64-bit systems          #
+###################################################################
+#else /* !(IP20||IP22||IP32) */
+else
+   CFLAGS+=" -64 -D_PAGESZ=16384 -D_MIPS3_ADDRSPACE"
+fi
+#/* IP20||IP22||IP32 */
+
+
+###################################################################
+# Platform specific - for device drivers on the indicated machine #
+###################################################################
+
+if [ "$CPUBOARD" == "IP19" ]; then
+   CFLAGS+=" -DIP19 -DEVEREST -DMP -DR4000"
+fi
+
+if [ "$CPUBOARD" == "IP20" ]; then
+   CFLAGS+=" -DIP20 -DR4000 -DJUMP_WAR -DBADVA_WAR"
+fi
+
+if [ "$CPUBOARD" == "IP21" ]; then
+   CFLAGS+=" -DIP21 -DEVEREST -DMP -DTFP -TARG:processor=r8000"
+fi
+
+if [ "$CPUBOARD" == "IP22" ]; then
+   CFLAGS+=" -DIP22 -DR4000 -DJUMP_WAR -DBADVA_WAR -DTRITON"
+fi
+
+if [ "$CPUBOARD" == "IP25" ]; then
+   CFLAGS+=" -DIP25 -DEVEREST -DMP -DR10000 -TARG:processor=r10000"
+fi
+
+if [ "$CPUBOARD" == "IP26" ]; then
+   CFLAGS+=" -DIP26 -DTFP -TARG:sync=off -TARG:processor=r8000"
+fi
+
+if [ "$CPUBOARD" == "IP27" ]; then
+   CFLAGS+=" -DIP27 -DR10000 -DMP -DSN0 -DSN \
+ -DMAPPED_KERNEL -DLARGE_CPU_COUNT -DPTE_64BIT -DULI -DCKPT -DMIPS4_ISA \
+ -DR10K_LLSC_WAR -DNUMA_BASE -DNUMA_PM  -DNUMA_TBORROW -DNUMA_MIGR_CONTROL \
+ -DNUMA_REPLICATION -DNUMA_REPL_CONTROL -DNUMA_SCHED -DCELL_PREPARE \
+ -DBHV_PREPARE -TARG:processor=r10000 "
+fi
+
+if [ "$CPUBOARD" == "IP28" ]; then
+# All Indigo2 10000 kernel modules must be built with the t5_no_spec_stores
+# option to the C compiler and assembler.
+   CFLAGS+=" -DIP28 -DR10000 -DSCACHE_SET_ASSOC=2 -D_NO_UNCACHED_MEM_WAR \
+ -DR10000_SPECULATION_WAR \
+ -TARG:processor=r10000 -TARG:t5_no_spec_stores "
+fi
+
+if [ "$CPUBOARD" == "IP30" ]; then
+   CFLAGS+=" -DIP30 -DR10000 -DMP -DCELL_PREPARE -DBHV_PREPARE \
+ -TARG:processor=r10000 "
+fi
+
+#O2
+if [ "$CPUBOARD" == "IP32" ]; then
+   CFLAGS+=" -DIP32 -DR4000 -DR10000 -DTRITON -DUSE_PCI_PIO -c99 "
+fi
+
+
+
+if [ "$CPUBOARD" == "IP35" ]; then
+   CFLAGS+=" -DIP35 -DR10000 -DMP -DSN1 -DSN \
+-DMAPPED_KERNEL -DLARGE_CPU_COUNT -DPTE_64BIT -DULI -DCKPT -DMIPS4_ISA \
+-DNUMA_BASE -DNUMA_PM -DNUMA_TBORROW -DNUMA_MIGR_CONTROL \
+-DNUMA_REPLICATION -DNUMA_REPL_CONTROL -DNUMA_SCHED -DCELL_PREPARE \
+-DBHV_PREPARE -TARG:processor=r10000 "
+fi
+
+#/usr/bin/c99 -D_KERNEL -DMP_STREAMS -D_MP_NETLOCKS -DMRSP_AS_MR  -fullwarn -non_shared 
+#-G 0 -TARG:force_jalr  -TENV:kernel -OPT:space -OPT:Olimit=0 -CG:unique_exit=on  
+#-TENV:X=1 align_aggregate -OPT:IEEE_arithmetic=1 -OPT:roundoff=0  
+#-OPT:wrap_around_unsafe_opt=off  -64 -D_PAGESZ=16384 -D_MIPS3_ADDRSPACE -DIP35 -DR10000 
+#-DMP -DSN1 -DSN  -DMAPPED_KERNEL -DLARGE_CPU_COUNT -DPTE_64BIT -DULI -DCKPT -DMIPS4_ISA  
+#-DNUMA_BASE -DNUMA_PM -DNUMA_TBORROW -DNUMA_MIGR_CONTROL  -DNUMA_REPLICATION 
+#-DNUMA_REPL_CONTROL -DNUMA_SCHED -DCELL_PREPARE  -DBHV_PREPARE -TARG:processor=r10000  
+#-c USBIRIX.c
+#
+#
+#
+
+##################################################################################
+# Creation of config.h
+##################################################################################
+DESCRIPTION_FILE="usb.version"
+CONFIG_H_IN_FILE="config.h.in"
+CONFIG_H_FILE="config.h"
+SHORTNAME=`cat $DESCRIPTION_FILE|grep SHORTNAME|awk -F= '{print $2}'|sed "s/\n//g"`
+LONGNAME=`cat $DESCRIPTION_FILE|grep LONGNAME|awk -F= '{print $2}'|sed "s/\n//g"`
+VERSION=`cat $DESCRIPTION_FILE|grep VERSION|awk -F= '{print $2}'|sed "s/\n//g"`
+SHORTVERSION=`echo $VERSION|sed "s/\.//g"|sed "s/\n//g"`
+SEQ=`date "+%H%M%S%m%d%Y"`
+BUILDDATE=`date "+%c"`
+
+cat $CONFIG_H_IN_FILE>$CONFIG_H_FILE
+
+echo "#define USBIRIX_DRV_SHORT_NAME                \"$SHORTNAME\"">>$CONFIG_H_FILE
+echo "#define USBIRIX_DRV_LONG_NAME                 \"$LONGNAME\"">>$CONFIG_H_FILE
+echo "#define USBIRIX_DRV_VERSION                   \"$VERSION\"">>$CONFIG_H_FILE
+echo "#define USBIRIX_DRV_SHORT_VERSION             \"$SHORTVERSION\"">>$CONFIG_H_FILE
+echo "#define USBIRIX_DRV_SEQ                       \"$SEQ\"">>$CONFIG_H_FILE
+echo "#define USBIRIX_BUILD_DATE                    \"$BUILDDATE\"">>$CONFIG_H_FILE
+echo >>$CONFIG_H_FILE
+echo >>$CONFIG_H_FILE
+
+DRIVER_SOURCES="pciehci.c"
+for SOURCES in $DRIVER_SOURCES; do
+    echo "$CC $CFLAGS -c $SOURCES"
+    $CC $CFLAGS -c $SOURCES
+done
+
+echo "Building ehciutil"
+USBUTIL_BUILD_COMMAND="$CC -o ehciutil ehciutil.c"
+echo $USBUTIL_BUILD_COMMAND
+`$USBUTIL_BUILD_COMMAND`
+
+

@@ -1,0 +1,35 @@
+
+[indentation]
+indent_width=4
+indent_type=1
+indent_hard_tab_width=8
+detect_indent=false
+indent_mode=2
+
+[project]
+name=PCI_USB
+base_path=/usr/people/garduno/USB_driver_IRIX/usb_irix.02132012
+description=DRIVER USB FOR SGI IRIX 6.5
+
+[long line marker]
+long_line_behaviour=1
+long_line_column=72
+
+[files]
+current_page=0
+FILE_NAME_0=37943;C;0;0;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix.02132012/pciehci.c;0
+FILE_NAME_1=0;C;0;16;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix.02132012/list.c;0
+FILE_NAME_2=2909;C;0;16;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix.02132012/gc.c;0
+FILE_NAME_3=4310;C;0;16;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix.02132012/dma.c;0
+FILE_NAME_4=23596;C;0;16;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix.02132012/usb.h;0
+FILE_NAME_5=38434;C;0;16;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix.02132012/pciba.c;0
+FILE_NAME_6=9861;C;0;16;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix.02132012/ehci.h;0
+
+[build-menu]
+CFT_00_LB=_Compile
+CFT_00_CM=./build.sh
+CFT_00_WD=
+CFT_01_LB=_Build
+CFT_01_CM=./build.sh
+CFT_01_WD=
+filetypes=C;

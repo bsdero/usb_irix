@@ -1,0 +1,32 @@
+/*
+********************************************************************
+* PCI EHCI Device Driver for Irix 6.5                              *
+*                                                                  *
+* Programmed by BSDero                                             *
+* bsdero at gmail dot com                                          *
+* 2011/2012                                                        *
+*                                                                  *
+*                                                                  *
+* File: trace.c                                                    *
+* Description: Tracing and debug macros and variable               *
+*                                                                  *
+*                                                                  *
+********************************************************************
+*******************************************************************************************************
+* FIXLIST (latest at top)                                                                             *
+*-----------------------------------------------------------------------------------------------------*
+* Author      MM-DD-YYYY     Description                                                              *
+*-----------------------------------------------------------------------------------------------------*
+* BSDero      01-09-2012     -Initial version                                                         *
+*                                                                                                     *
+*******************************************************************************************************
+*/
+
+#define TRACE( trc_class, trc_level, fmt, ...)                                                                      \
+            if(( trc_level >= global_trace_class.level) && ( (trc_class & global_trace_class.class) != 0))  \
+                printf( "PCIEHCI,%s,%s,%d:"fmt"\n", __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+
+
+EHCI_trace_class_t      global_trace_class = { 0xff, TRC_ALL};
+
+

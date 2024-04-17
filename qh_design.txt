@@ -1,0 +1,144 @@
+/****************************************************************
+
+organization of memory inside ehci driver 
+
+
+
+1.-A DMA segment with Max 48 Queue heads. It should be enough by now. Let's call QH DMA Segment
+2.-A DMA segment for both data and Qtds. Each active QH (or endpoint) will have it's own active 
+    DMA segment. In this DMA segment, both Qtds and Data will live for each QHead. Let's call Data DMA segment.
+	
+
+In order to access USB data, memory should be dynamic. DMA should be dynamic also. 
+
+Segment 1 should not change at entire live/run of driver. This may be different in the future
+Each Queue Head may have a DMA segment with both Qtds and data. 
+
+The QH list is a big array. Each element should content the next data: 
+1.- Address of a single QH
+2.- Linked/active flag
+3.- Device and kernel address of DMA space for Qtds. 
+4.- Each QH represents a endPoint
+
+
+
+The best steps for this are: 
+
+1.-Create the Qhead list in a DMA segment. 
+  1a.-Link all the Queue head, but set as inactive
+2.-When a transference is needed: 
+  2a.-Setup a new endpoint. 
+  2b.-If endpoint is 0, uses only two Qtds: IN and out.
+  2c.-buffer size will depend on default/current configuration. It can be overrided by user request or ioctl 
+  
+
+
+
+
+                                                                   
+                                                                     
+                                             
+Notes about 
+
+  IOCTL_EHCI_DRIVER_INFO
+  IOCTL_EHCI_ROOT_HUB_INFO
+  IOCTL_EHCI_SET_DEBUG_CLASS
+  IOCTL_EHCI_GET_DEBUG_CLASS
+  IOCTL_EHCI_GET_EVENT  
+  IOCTL_EHCI_SEND_RAW_URB
+  IOCTL_EHCI_RECV_RAW_URB
+  IOCTL_EHCI_HC_RESET
+  IOCTL_EHCI_HC_SUSPEND
+  IOCTL_EHCI_PORT_RESET
+  IOCTL_EHCI_PORT_SUSPEND
+  IOCTL_EHCI_PORT_ENABLE
+  IOCTL_EHCI_SETUP_ASYNC_TRANSFER
+  IOCTL_EHCI_SET_CONFIGURATION
+
+  
+  
+
+
+
+
+
+*/
+
+static struct{
+    int       id;
+    uchar_t *str;
+}ehci_ioctls[]={
+    IOCTL_EHCI_DRIVER_INFO,            "IOCTL_EHCI_DRIVER_INFO",
+	IOCTL_EHCI_PORTS_STATUS,           "IOCTL_EHCI_PORTS_STATUS",
+	IOCTL_EHCI_SET_DEBUG_LEVEL,        "IOCTL_EHCI_SET_DEBUG_LEVEL",
+	IOCTL_EHCI_GET_DEBUG_LEVEL,        "IOCTL_EHCI_GET_DEBUG_LEVEL",
+    IOCTL_PCI_INFO,                    "IOCTL_PCI_INFO",
+	IOCTL_EHCI_SETUP_TRANSFER,         "IOCTL_EHCI_SETUP_TRANSFER", 
+	IOCTL_EHCI_ENUMERATE,              "IOCTL_EHCI_ENUMERATE", 
+	IOCTL_EHCI_CHECKINFO,              "IOCTL_EHCI_CHECKINFO",
+	IOCTL_EHCI_DUMP_DATA,              "IOCTL_EHCI_DUMP_DATA",
+	-1,                                "UNKNOWN IOCTL",
+    0, NULL
+};
+
+
+
+char *get_ioctl_str( int cmd){
+    int i;
+
+
+    for( i = 0; ehci_ioctls[i].str != NULL; i++){
+	    if( cmd == ehci_ioctls[i].cmd)
+		    return( (char *) ehci_ioctls[i].str);
+    }
+
+    if( i > 0) 	
+	    return( (char *) ehci_ioctls[i - 1].str);
+		
+    return(NULL);
+}
+
+
+typedef struct{
+    qh *queuehead;
+	
+
+}
+
+
+
+typedef struct{
+    uchar_t       *qtd_kaddr;      /* kernel address of queue head */
+	uint32_t      qtd_daddr;       /* device address of queue head */
+    uint32_t      flags;           /* qtd flags                    */ 
+	
+
+}
+
+
+typedef struct{
+    uchar_t       *kaddr;  /* kernel address of queue head */
+	uint32_t      daddr;   /* device address of queue head */
+#define QH_PROCESSED                    0x0001
+#define QH_ACTIVE                       0x0002
+#define QH_QUEUED                       0x0004
+#define QH_RESERVED                     0x0008	
+#define QH_HAS_QTDS                     0x0010	
+	uint32_t      status;
+	list_t        qtds;
+	uint32_t      receive_transfer_size;
+	uint32_t      send_transfer_size;
+}qh_descriptor_t;
+
+typedef struct{
+    dma_node_t   dma_queue_heads;
+	uint32_t
+}
+
+/* creates a qh_list */
+qh_element_t *ehci_dma_struct_alloc(); /* return a QH with no QTD's added to list and ready to work  */ 
+qtd *qh_element_get_qtd( int *num_qtd); /* 
+
+
+
+

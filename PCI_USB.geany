@@ -1,0 +1,51 @@
+
+[indentation]
+indent_width=4
+indent_type=1
+indent_hard_tab_width=8
+detect_indent=false
+indent_mode=2
+
+[project]
+name=PCI_USB
+base_path=/usr/people/garduno/USB_driver_IRIX/usb_irix
+description=DRIVER USB FOR SGI IRIX 6.5
+
+[long line marker]
+long_line_behaviour=1
+long_line_column=72
+
+[files]
+current_page=10
+FILE_NAME_0=10860;C;0;16;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix/usbcore.c;0
+FILE_NAME_1=2322;C;0;0;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix/usbio.h;0
+FILE_NAME_2=12757;C;0;16;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix/usbioctl.h;0
+FILE_NAME_3=11833;C;0;0;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix/pciehci.c;0
+FILE_NAME_4=4371;C;0;0;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix/usbhc.h;0
+FILE_NAME_5=6992;C;0;16;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix/usb.h;0
+FILE_NAME_6=1752;C;0;16;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix/usbioctl_funcs.c;0
+FILE_NAME_7=2127;C;0;16;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix/trace.c;0
+FILE_NAME_8=1023;C;0;0;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix/usbehci.c;0
+FILE_NAME_9=1451;C;0;0;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix/pci_code_attach.c;0
+FILE_NAME_10=28812;C;0;0;1;1;0;/usr/people/garduno/USB_driver_IRIX/usb_irix/usbuhci.c;0
+
+[build-menu]
+CFT_00_LB=_Compile
+CFT_00_CM=
+CFT_00_WD=
+CFT_01_LB=_Build
+CFT_01_CM=
+CFT_01_WD=
+filetypes=C;
+NF_00_LB=_Make
+NF_00_CM=./build.sh
+NF_00_WD=
+NF_01_LB=Make Custom _Target
+NF_01_CM=
+NF_01_WD=
+NF_02_LB=Make _Object
+NF_02_CM=
+NF_02_WD=
+EX_00_LB=_Execute
+EX_00_CM=
+EX_00_WD=

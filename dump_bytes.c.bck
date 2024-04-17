@@ -1,0 +1,168 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define OP_IO( c, n)                       (( c << 8) | n)
+
+
+#define IOCTL_TEST                         OP_IO('A', 1)
+
+int ehci_hcreset(pciehci_soft_t sc){
+    uint32_t hcr;
+    int i, rc = 1;
+
+    EOWRITE4(sc, EHCI_USBCMD, 0);/* Halt controller */
+    for (i = 0; i < 1000; i++) {
+        USECDELAY(1000);
+        hcr = EOREAD4(sc, EHCI_USBSTS) & EHCI_STS_HCH;
+        if (hcr){
+		    rc = 0; 
+		    printf("Host controller halted (HCH = 1)\n");
+            break;
+		}
+    }
+
+    if (!hcr){
+        printf("Host controller halttimeout (HCH = 0 after one second, it didn't stop)\n");
+	}
+	return( rc);
+ }
+
+ 
+int ehci_port_reset( pciehci_soft_t sc, int port){
+    int i, rc, port_status, hcr = 1;
+	uint32_t v;
+	
+	rc = ehci_hcreset( sc);
+	if( rc != 0) {
+	    printf("got error from ehci_chreset(), resetting port anyway\n");
+	}
+	
+
+	
+	v = EOREAD4(sc, EHCI_PORTSC(port))  & ~EHCI_PS_CLEAR;
+	/* port enable */
+	EOWRITE4(sc, EHCI_PORTSC(port), v | EHCI_PS_PE);
+	EOWRITE4(sc, port, v & ~EHCI_PS_PE);
+	
+	/* port suspend */
+	EOWRITE4(sc, EHCI_PORTSC(port), v | EHCI_PS_SUSP);
+	
+	
+	/* op reset port */
+    v &= ~(EHCI_PS_PE | EHCI_PS_PR); 
+	EOWRITE4(sc, EHCI_PORTSC(port), v | EHCI_PS_PR);
+	
+    for (i = 0; i < 1000; i++) {
+        USECDELAY(1000);
+        hcr = EOREAD4(sc, EHCI_PORTSC(port)) & EHCI_PS_PR;
+        if (hcr){
+		    rc = 0; 
+		    printf("Host controller halted (HCH = 1)\n");
+            break;
+		}
+    }
+	
+	
+	
+}
+
+void dump_uint32( uint32_t *u32, size_t size){
+    int i, j;
+	unsigned char *p;
+	size /= 4;
+	printf("--------  ------------  ----\n");
+	for( i = 0; i < size; i++){
+	    
+	    printf("[0x%04x]  [0x%08x]  ", i, u32[i]); 
+		p = (unsigned char *) &u32[i];
+		for( j = 0; j < 4; j++ ){
+		    if( isprint( *p)) 
+			    printf("%c", *p);
+		    else
+                printf(".");		
+            p++;
+			
+		}
+		printf("\n");
+	}
+}
+
+void dump_bytes( unsigned char *p, size_t size){
+    unsigned int i, j, l, m;
+	char *q;
+	
+	
+    printf("     _0 _1 _2 _3 _4 _5 _6 _7  _8 _9 _A _B _C _D _E _F    01234567 89ABCDEF\n");
+	printf("     -----------------------  -----------------------    -------- --------\n");
+	
+	m = l = 0;
+	do{
+	    
+	    printf("%02x   ", l);
+	    for( i = 0; i < 8; i++, l++){
+		    if( l < size)
+		        printf("%02x ", p[i]);
+			else
+			    printf("   ");
+		}
+		
+		printf(" ");
+		for( ; i < 16; i++, l++){
+		    if( l < size)
+		        printf("%02x ", p[i]);
+			else
+			    printf("   ");
+		}
+		
+		printf("   ");
+	    for( i = 0; i < 8; i++, m++){
+		    if( m < size)
+			    if( isprint( p[i] ))
+		            printf("%c", p[i]);
+				else
+				    printf(".");
+			else
+			    printf(" ");
+		}
+		
+		printf(" ");
+		for( ; i < 16; i++, m++){
+		    if( m < size)
+			    if( isprint( p[i] ))
+		            printf("%c", p[i]);
+				else
+				    printf(".");
+			else
+			    printf(" ");
+		}
+		
+		p = p + 16;
+		printf("\n");
+		
+		
+	}while( l < size);
+	printf("\n");
+}
+
+
+int main(){
+    char str[]="tres tristes tigres tragaban trigo sentados en un trigal ::!! 0123456789abcdef\n";
+	char str2[256];
+	int i;
+	int n;
+	
+	for( i = 0; i < 256; i++)
+	    str2[i] = i;
+	dump_bytes( str, strlen( str));
+	
+	dump_bytes( str2, 256);
+	
+	dump_uint32( (uint32_t *)  str, strlen( str));
+	dump_uint32( (uint32_t *)  str2, 256);
+	printf("octl = %x\n", IOCTL_TEST);
+	n = IOCTL_TEST;
+	dump_bytes( (unsigned char *) &n, sizeof( int));
+	printf("sizeof( int) = %d\n", sizeof(int));
+	return(0);
+}

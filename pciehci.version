@@ -1,0 +1,3 @@
+SHORTNAME=PCIEHCI
+LONGNAME=PCI EHCI USB Controller Driver for SGI Irix 6.5.x <bsdero at gmail dot org>
+VERSION=0.0.1.4

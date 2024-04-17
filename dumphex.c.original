@@ -1,0 +1,61 @@
+/*
+********************************************************************
+* PCI EHCI Device Driver for Irix 6.5                              *
+*                                                                  *
+* Programmed by BSDero                                             *
+* bsdero at gmail dot com                                          *
+* Dump bytes utilities                                             *
+* 2011                                                             *
+*                                                                  *
+********************************************************************
+
+*******************************************************************************************************
+* FIXLIST (latest at top)                                                                             *
+*-----------------------------------------------------------------------------------------------------*
+* Author      MM-DD-YYYY     Description                                                              *
+*-----------------------------------------------------------------------------------------------------*
+* BSDero      01-05-2012     -Initial version                                                         *
+*                                                                                                     *
+*******************************************************************************************************
+*/
+
+int dumphex(  uint64_t class, uchar_t level, unsigned char *s, size_t len);
+
+int dumphex(  uint64_t class, uchar_t level, unsigned char *s, size_t len){
+    unsigned char *p = s;
+    long int i, j;
+    printf("DUMP address=0x%08x\n", s);
+    if( p == NULL){
+        printf("s=NULL\n");
+        return 0;
+    }
+
+    j = 0;
+    do{
+        i = 0;
+        do{
+            if( p[j+i] < 128 && p[j+i] > 31)
+                printf( "%c", p[j+i]);
+            else
+                printf(".");
+            i++;
+        }while(i < 16 && j+i < len);
+
+        if( i < 8) printf("\t");
+        if( i < 16) printf("\t");
+        i = 0;
+            printf("\t");
+        do{
+            if(p[j+i] < 16 )
+                printf("0%x ", p[j+i]);
+            else
+                printf("%x ", p[j+i]);
+            i++;
+        }while(i < 16 && j+i < len);
+        j += 16;
+        printf("\n");
+       
+    }while(j < len);
+    return 0;
+}
+

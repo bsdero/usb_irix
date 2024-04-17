@@ -1,0 +1,341 @@
+cc-1164 c99: WARNING File = dumphex.c, Line = 41
+  Argument of type "unsigned char *" is incompatible with parameter of type
+          "char *restrict".
+
+      strcpy( str, "");
+              ^
+
+cc-1164 c99: WARNING File = dumphex.c, Line = 42
+  Argument of type "unsigned char *" is incompatible with parameter of type
+          "char *restrict".
+
+      strcpy( str2, "");
+              ^
+
+cc-1164 c99: WARNING File = dumphex.c, Line = 48
+  Argument of type "unsigned char *" is incompatible with parameter of type
+          "char *".
+
+                  sprintf( str,  "%c", p[j+i]);
+                           ^
+
+cc-1164 c99: WARNING File = dumphex.c, Line = 49
+  Argument of type "unsigned char *" is incompatible with parameter of type
+          "char *restrict".
+
+                  strcat( str2, str);
+                          ^
+
+cc-1164 c99: WARNING File = dumphex.c, Line = 49
+  Argument of type "unsigned char *" is incompatible with parameter of type
+          "const char *restrict".
+
+                  strcat( str2, str);
+                                ^
+
+cc-1164 c99: WARNING File = dumphex.c, Line = 51
+  Argument of type "unsigned char *" is incompatible with parameter of type
+          "char *restrict".
+
+                  strcat( str2, ".");
+                          ^
+
+cc-1164 c99: WARNING File = dumphex.c, Line = 57
+  Argument of type "unsigned char *" is incompatible with parameter of type
+          "char *restrict".
+
+              strcat( str2, "\t");
+                      ^
+
+cc-1164 c99: WARNING File = dumphex.c, Line = 61
+  Argument of type "unsigned char *" is incompatible with parameter of type
+          "char *restrict".
+
+              strcat( str2, "\t");
+                      ^
+
+cc-1164 c99: WARNING File = dumphex.c, Line = 65
+  Argument of type "unsigned char *" is incompatible with parameter of type
+          "char *restrict".
+
+          strcat( str2, "\t");
+                  ^
+
+cc-1164 c99: WARNING File = dumphex.c, Line = 68
+  Argument of type "unsigned char *" is incompatible with parameter of type
+          "char *".
+
+                  sprintf( str, "0%x ", p[j+i]);
+                           ^
+
+cc-1164 c99: WARNING File = dumphex.c, Line = 70
+  Argument of type "unsigned char *" is incompatible with parameter of type
+          "char *".
+
+                  sprintf( str, "%x ", p[j+i]);
+                           ^
+
+cc-1164 c99: WARNING File = dumphex.c, Line = 71
+  Argument of type "unsigned char *" is incompatible with parameter of type
+          "char *restrict".
+
+              strcat( str2, str);
+                      ^
+
+cc-1164 c99: WARNING File = dumphex.c, Line = 71
+  Argument of type "unsigned char *" is incompatible with parameter of type
+          "const char *restrict".
+
+              strcat( str2, str);
+                            ^
+
+cc-1164 c99: WARNING File = dumphex.c, Line = 77
+  Argument of type "unsigned char *" is incompatible with parameter of type
+          "char *restrict".
+
+          strcpy( str2, "");
+                  ^
+
+cc-1164 c99: WARNING File = dumphex.c, Line = 78
+  Argument of type "unsigned char *" is incompatible with parameter of type
+          "char *restrict".
+
+          strcpy( str, ""); 
+                  ^
+
+cc-1174 c99: WARNING File = dma.c, Line = 68
+  The variable "pages" was declared but never referenced.
+
+      long int                pages;
+                              ^
+
+cc-1164 c99: WARNING File = dma.c, Line = 142
+  Argument of type "pciio_dmamap_t *" is incompatible with parameter of type
+          "pciio_dmamap_t".
+
+      pciio_dmamap_drain( &dma_node->map);
+                          ^
+
+cc-1174 c99: WARNING File = pciehci.c, Line = 416
+  The variable "hcr" was declared but never referenced.
+
+      uint32_t hcr;
+               ^
+
+cc-1174 c99: WARNING File = pciehci.c, Line = 419
+  The variable "n" was declared but never referenced.
+
+      int n;
+          ^
+
+cc-3968 c99: WARNING File = pciehci.c, Line = 741
+  implicit conversion of a 64-bit integral type to a smaller integral type
+          (potential portability problem)
+
+      qt_gd->qtd_next = (((uint32_t )dma_node->daddr) + sizeof( ehci_qh_t) + sizeof(ehci_qtd_t)) & 0xffffffe0 ;
+                      ^
+
+cc-3968 c99: WARNING File = pciehci.c, Line = 744
+  implicit conversion of a 64-bit integral type to a smaller integral type
+          (potential portability problem)
+
+      qt_gd->qtd_buffer[0] = ((uint32_t )dma_node->daddr) + sizeof( ehci_qh_t) + (3 * sizeof(ehci_qtd_t));
+                           ^
+
+cc-3968 c99: WARNING File = pciehci.c, Line = 747
+  implicit conversion of a 64-bit integral type to a smaller integral type
+          (potential portability problem)
+
+      qt_in->qtd_next = (((uint32_t )dma_node->daddr)  + sizeof( ehci_qh_t) + (2 *  sizeof(ehci_qtd_t)) )  & 0xffffffe0 ;
+                      ^
+
+cc-3968 c99: WARNING File = pciehci.c, Line = 750
+  implicit conversion of a 64-bit integral type to a smaller integral type
+          (potential portability problem)
+
+      qt_in->qtd_buffer[0] = ((uint32_t)dma_node->daddr)  + sizeof( ehci_qh_t) + (3 * sizeof(ehci_qtd_t)) + 64;
+                           ^
+
+cc-3968 c99: WARNING File = pciehci.c, Line = 764
+  implicit conversion of a 64-bit integral type to a smaller integral type
+          (potential portability problem)
+
+      qh->qtd_next = ((uint32_t )dma_node->daddr) + sizeof( ehci_qh_t);
+                   ^
+
+cc-1162 c99: ERROR File = pciehci.c, Line = 882
+  Too few arguments in function call.
+
+          ehci_enumerate();
+                         ^
+
+cc-3968 c99: WARNING File = pciehci.c, Line = 936
+  implicit conversion of a 64-bit integral type to a smaller integral type
+          (potential portability problem)
+
+          eec = pci_read_config(sc->ps_conn, eecp, 4);
+              ^
+
+cc-3968 c99: WARNING File = pciehci.c, Line = 940
+  implicit conversion of a 64-bit integral type to a smaller integral type
+          (potential portability problem)
+
+          bios_sem = pci_read_config(sc->ps_conn, eecp + EHCI_LEGSUP_BIOS_SEM, 1);
+                   ^
+
+cc-3968 c99: WARNING File = pciehci.c, Line = 948
+  implicit conversion of a 64-bit integral type to a smaller integral type
+          (potential portability problem)
+
+              bios_sem = pci_read_config(sc->ps_conn, eecp + EHCI_LEGSUP_BIOS_SEM, 1);
+                       ^
+
+cc-1174 c99: WARNING File = pciehci.c, Line = 1013
+  The variable "device_description" was declared but never referenced.
+
+      uchar_t *device_description;
+               ^
+
+cc-3968 c99: WARNING File = pciehci.c, Line = 1106
+  implicit conversion of a 64-bit integral type to a smaller integral type
+          (potential portability problem)
+
+      vendor_id = PCI_CFG_GET16(conn, EHCI_CF_VENDOR_ID);
+                ^
+
+cc-3968 c99: WARNING File = pciehci.c, Line = 1107
+  implicit conversion of a 64-bit integral type to a smaller integral type
+          (potential portability problem)
+
+      device_id = PCI_CFG_GET16(conn, EHCI_CF_DEVICE_ID);
+                ^
+
+cc-3968 c99: WARNING File = pciehci.c, Line = 1108
+  implicit conversion of a 64-bit integral type to a smaller integral type
+          (potential portability problem)
+
+      ssid = PCI_CFG_GET32( conn, EHCI_CF_SSID);
+           ^
+
+cc-3968 c99: WARNING File = pciehci.c, Line = 1109
+  implicit conversion of a 64-bit integral type to a smaller integral type
+          (potential portability problem)
+
+      rev_id = PCI_CFG_GET8( conn, EHCI_CF_REVISION_ID);
+             ^
+
+cc-1164 c99: WARNING File = pciehci.c, Line = 1120
+  Argument of type "uchar_t *" is incompatible with parameter of type
+          "const char *restrict".
+
+              strcpy( soft->controller_desc.description, ehci_descriptions[i].controller_description);
+                                                         ^
+
+cc-1164 c99: WARNING File = pciehci.c, Line = 1125
+  Argument of type "char *" is incompatible with parameter of type
+          "unsigned char *".
+
+      dumphex( 0xffffffff, 0xff, soft->controller_desc.description, strlen( soft->controller_desc.description));
+                                 ^
+
+cc-3968 c99: WARNING File = pciehci.c, Line = 1177
+  implicit conversion of a 64-bit integral type to a smaller integral type
+          (potential portability problem)
+
+          val = pci_read_config(conn, EHCI_DS_MAX_TURN_AROUND_TIME, 1);
+              ^
+
+cc-3968 c99: WARNING File = pciehci.c, Line = 1261
+  implicit conversion of a 64-bit integral type to a smaller integral type
+          (potential portability problem)
+
+      qh->qh_link = dma_node->daddr & 0xffffffe0 | 0x00000002;
+                  ^
+
+cc-3968 c99: WARNING File = pciehci.c, Line = 1270
+  implicit conversion of a 64-bit integral type to a smaller integral type
+          (potential portability problem)
+
+      EOWRITE4(soft, EHCI_ASYNCLISTADDR, dma_node->daddr);
+      ^
+
+cc-1552 c99: WARNING File = pciehci.c, Line = 1059
+  The variable "registers" is set but never used.
+
+      ehci_mmap_registers_t   *registers;
+                               ^
+
+cc-1164 c99: WARNING File = pciehci.c, Line = 1520
+  Argument of type "uchar_t *" is incompatible with parameter of type
+          "char *restrict".
+
+              strcpy( EHCI_info.long_name, PCIEHCI_DRV_LONG_NAME);
+                      ^
+
+cc-1164 c99: WARNING File = pciehci.c, Line = 1521
+  Argument of type "uchar_t *" is incompatible with parameter of type
+          "char *restrict".
+
+              strcpy( EHCI_info.short_name, PCIEHCI_DRV_SHORT_NAME);
+                      ^
+
+cc-1164 c99: WARNING File = pciehci.c, Line = 1522
+  Argument of type "uchar_t *" is incompatible with parameter of type
+          "char *restrict".
+
+              strcpy( EHCI_info.version, PCIEHCI_DRV_VERSION);
+                      ^
+
+cc-1164 c99: WARNING File = pciehci.c, Line = 1523
+  Argument of type "uchar_t *" is incompatible with parameter of type
+          "char *restrict".
+
+              strcpy( EHCI_info.short_version, PCIEHCI_DRV_SHORT_VERSION);
+                      ^
+
+cc-1164 c99: WARNING File = pciehci.c, Line = 1524
+  Argument of type "uchar_t *" is incompatible with parameter of type
+          "char *restrict".
+
+              strcpy( EHCI_info.seqn, PCIEHCI_DRV_SEQ);
+                      ^
+
+cc-1164 c99: WARNING File = pciehci.c, Line = 1525
+  Argument of type "uchar_t *" is incompatible with parameter of type
+          "char *restrict".
+
+              strcpy( EHCI_info.build_date, PCIEHCI_BUILD_DATE);
+                      ^
+
+cc-1164 c99: WARNING File = pciehci.c, Line = 1541
+  Argument of type "uchar_t *" is incompatible with parameter of type
+          "char *restrict".
+
+              strcpy( EHCI_controller_info.device_string, soft->controller_desc.description);
+                      ^
+
+cc-1174 c99: WARNING File = pciehci.c, Line = 1503
+  The variable "data_in" was declared but never referenced.
+
+      char *data_in, *data_out;
+            ^
+
+cc-1174 c99: WARNING File = pciehci.c, Line = 1503
+  The variable "data_out" was declared but never referenced.
+
+      char *data_in, *data_out;
+                      ^
+
+cc-3201 c99: REMARK File = pciehci.c, Line = 1614
+  The parameter "anyyet" was never referenced.
+
+  int pciehci_poll(dev_t dev, short events, int anyyet,
+                                                ^
+
+cc-1174 c99: WARNING File = pciehci.c, Line = 1624
+  The variable "wanted" was declared but never referenced.
+
+      short wanted = events & OUR_EVENTS;
+            ^
+
+1 error detected in the compilation of "pciehci.c".

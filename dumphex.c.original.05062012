@@ -1,0 +1,88 @@
+/*
+********************************************************************
+* PCI EHCI Device Driver for Irix 6.5                              *
+*                                                                  *
+* Programmed by BSDero                                             *
+* bsdero at gmail dot com                                          *
+* 2011/2012                                                        *
+*                                                                  *
+*                                                                  *
+* File: dumphex.c                                                  *
+* Description: Byte dump utility function                          *
+*                                                                  *
+*                                                                  *
+********************************************************************
+*******************************************************************************************************
+* FIXLIST (latest at top)                                                                             *
+*-----------------------------------------------------------------------------------------------------*
+* Author      MM-DD-YYYY     Description                                                              *
+*-----------------------------------------------------------------------------------------------------*
+* BSDero      01-16-2012     -Fixes for better dump appearance                                        *
+*                                                                                                     *
+* BSDero      01-05-2012     -Initial version                                                         *
+*                                                                                                     *
+*******************************************************************************************************
+*/
+
+
+int dumphex( uint64_t class, uchar_t level, unsigned char *s, size_t len);
+
+int dumphex( uint64_t class, uchar_t level, unsigned char *s, size_t len){
+    unsigned char *p = s;
+    long int i, j;
+    unsigned char str[256], str2[256];
+    
+	if( global_trace_class.level < level) 
+	    return(0);
+	
+	if((class & global_trace_class.class) == 0)
+	    return(0);
+	
+    printf("DUMP address=0x%08x\n", s);
+    if( p == NULL){
+        TRACE( class, level,"DUMP addess = NULL\n", NULL);
+        return 0;
+    }
+
+    j = 0;
+    do{
+        i = 0;
+        do{
+            /*if( p[j+i] < 128 && p[j+i] > 31){*/
+			if( isprint( p[j+i])){ 
+                sprintf( (char *)str,  "%c", p[j+i]);
+                strcat( (char *)str2, (char *)str);
+            }else{
+                strcat( (char *)str2, ".");
+            }
+            i++;
+        }while(i < 16 && j+i < len);
+
+        if( i < 8){
+            strcat( (char *)str2, "\t");
+        }
+        
+        if( i < 16){
+            strcat( (char *)str2, "\t");
+        }
+        
+        i = 0;
+        strcat( (char *)str2, "\t");
+        do{
+            if(p[j+i] < 16 )
+                sprintf( (char *)str, "0%x ", p[j+i]);
+            else
+                sprintf( (char *)str, "%x ", p[j+i]);
+            strcat( (char *)str2, (char *)str);
+            i++;
+        }while(i < 16 && j+i < len);
+        j += 16;
+        
+        printf("%s\n", (char *)str2);
+        strcpy( (char *)str2, "");
+        strcpy( (char *)str, ""); 
+    }while(j < len);
+    return 0;
+}
+
+
